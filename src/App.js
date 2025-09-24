@@ -26,6 +26,10 @@ function App() {
   const [sortedOption,setSortedOption] = useState('default');
   const [loading, setLoading] = useState(true);
 
+  // pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -58,6 +62,19 @@ function App() {
   },[]);
 
 
+  // pagination variables
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentProducts = sortedProducts.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  },[searchTerm,category,sortedOption])
+
+
   let content;
   if(loading) {
     content = <p>Loading ...</p>
@@ -65,7 +82,7 @@ function App() {
   else {
     content = (
       <div>
-          <ProductList products={sortedProducts} />
+          <ProductList products={currentProducts} />
       </div>
     )
   }
@@ -82,6 +99,20 @@ function App() {
           </div>
           <div className='mt-5'>
             {content}
+          </div>
+          <div className="flex justify-center mt-6 space-x-2">
+            {Array.from({length: totalPages}, (_,i) => i +1).map(page => (
+              <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={`px-3 py-1 border rounded-md ${page === currentPage
+                ? "bg-blue-600 text-white"
+                : "bg-white text-gray-700 hover:bg-gray-100"
+                }`}
+            >
+              {page}
+            </button>
+            ))}
           </div>
         </div>
 
